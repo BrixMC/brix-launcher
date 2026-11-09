@@ -1,5 +1,6 @@
 package com.kdt.mcgui;
 
+import net.kdt.pojavlaunch.fragments.BrixLoginFragment;
 import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -131,6 +132,17 @@ public class mcAccountSpinner extends AppCompatSpinner implements AdapterView.On
         return false;
     };
 
+    /* Triggered when a Brix account has just logged in */
+    private final ExtraListener<MinecraftAccount> mBrixLoginListener = (key, value) -> {
+        try {
+            value.save();
+        } catch (IOException e) {
+            Log.e("McAccountSpinner", "Failed to save the Brix account : " + e);
+        }
+        mDoneListener.onLoginDone(value);
+        return false;
+    };
+
     /* Triggered when we need to perform mojang login */
     private final ExtraListener<String[]> mMojangLoginListener = (key, value) -> {
         if(value[1].isEmpty()){ // Test mode
@@ -161,6 +173,7 @@ public class mcAccountSpinner extends AppCompatSpinner implements AdapterView.On
 
         ExtraCore.addExtraListener(ExtraConstants.MOJANG_LOGIN_TODO, mMojangLoginListener);
         ExtraCore.addExtraListener(ExtraConstants.MICROSOFT_LOGIN_TODO, mMicrosoftLoginListener);
+        ExtraCore.addExtraListener(BrixLoginFragment.EXTRA_BRIX_LOGIN, mBrixLoginListener);
     }
 
 

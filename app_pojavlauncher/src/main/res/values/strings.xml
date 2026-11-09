@@ -517,4 +517,15 @@
     <string name="angelica_found_sfpew_notice">Angelica mod found, Simple FPE Wrapper not needed</string>
     <string name="use_angle_checkbox">Use ANGLE (might help FPS)</string>
 
+    <string name="brix_auth_button" translatable="false">Brix Account</string>
+    <string name="brix_login_username_hint" translatable="false">Username</string>
+    <string name="brix_login_password_hint" translatable="false">Password</string>
+    <string name="brix_login_label" translatable="false">Login</string>
+    <string name="brix_register_label" translatable="false">Register</string>
+    <string name="brix_bad_username" translatable="false">Username must be 3-16 characters: letters, numbers, underscore</string>
+    <string name="brix_bad_password" translatable="false">Password must be at least 8 characters</string>
+    <string name="brix_err_credentials" translatable="false">Wrong username or password</string>
+    <string name="brix_err_taken" translatable="false">That username is already taken</string>
+    <string name="brix_err_network" translatable="false">Could not reach the Brix server</string>
+    <string name="brix_err_generic" translatable="false">Login failed (%s)</string>
 </resources>

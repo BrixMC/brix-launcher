@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_app"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:paddingHorizontal="@dimen/fragment_padding_medium">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/background_card"
+            android:orientation="vertical"
+            android:padding="@dimen/_20sdp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/brix_login_username_hint" />
+
+            <com.kdt.mcgui.MineEditText
+                android:id="@+id/brix_username"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/_37sdp"
+                android:imeOptions="flagNoExtractUi"
+                android:inputType="text"
+                android:textSize="@dimen/_16ssp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_8sdp"
+                android:text="@string/brix_login_password_hint" />
+
+            <com.kdt.mcgui.MineEditText
+                android:id="@+id/brix_password"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/_37sdp"
+                android:imeOptions="flagNoExtractUi"
+                android:inputType="textPassword"
+                android:textSize="@dimen/_16ssp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_12sdp"
+                android:orientation="horizontal">
+
+                <com.kdt.mcgui.MineButton
+                    android:id="@+id/brix_login_button"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/_42sdp"
+                    android:layout_weight="1"
+                    android:text="@string/brix_login_label"
+                    android:textColor="@android:color/white" />
+
+                <com.kdt.mcgui.MineButton
+                    android:id="@+id/brix_register_button"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/_42sdp"
+                    android:layout_marginStart="@dimen/_8sdp"
+                    android:layout_weight="1"
+                    android:text="@string/brix_register_label"
+                    android:textColor="@android:color/white" />
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>
