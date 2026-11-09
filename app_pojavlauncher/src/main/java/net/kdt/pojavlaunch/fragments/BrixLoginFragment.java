@@ -70,6 +70,7 @@ public class BrixLoginFragment extends Fragment {
                 account.profileId = res.getString("uuid");
                 account.accessToken = res.getString("accessToken");
                 account.expiresAt = res.getLong("expiresAt") * 1000L;
+                account.isBrix = true;
 
                 ui(() -> {
                     ExtraCore.setValue(EXTRA_BRIX_LOGIN, account);

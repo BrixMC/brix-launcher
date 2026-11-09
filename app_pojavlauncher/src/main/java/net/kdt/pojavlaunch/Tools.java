@@ -539,6 +539,13 @@ public final class Tools {
         }
         // We use a janky lwjgl setup. We don't want more people complaining it crashes.
         if (hasSodiumMod) javaArgList.add("-Dsodium.checks.issue2561=false");
+        // Brix accounts: route auth and skins to the Brix API via authlib-injector
+        if (minecraftAccount.isBrix) {
+            File authlibJar = new File(Tools.DIR_DATA, "authlib_injector/authlib-injector.jar");
+            if (!authlibJar.exists()) AsyncAssetManager.unpackComponents(activity);
+            if (!authlibJar.exists()) throw new RuntimeException("Failed to extract authlib-injector!");
+            javaArgList.add("-javaagent:" + authlibJar.getAbsolutePath() + "=https://brix-api.brix-account.workers.dev");
+        }
         javaArgList.add(versionInfo.mainClass);
         javaArgList.addAll(Arrays.asList(launchArgs));
         // ctx.appendlnToLog("full args: "+javaArgList.toString());
