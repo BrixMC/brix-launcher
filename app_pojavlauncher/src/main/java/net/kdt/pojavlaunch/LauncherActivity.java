@@ -38,6 +38,7 @@ import net.kdt.pojavlaunch.extra.ExtraCore;
 import net.kdt.pojavlaunch.extra.ExtraListener;
 import net.kdt.pojavlaunch.fragments.MainMenuFragment;
 import net.kdt.pojavlaunch.fragments.MicrosoftLoginFragment;
+import net.kdt.pojavlaunch.fragments.BrixWebFragment;
 import net.kdt.pojavlaunch.fragments.SelectAuthFragment;
 import net.kdt.pojavlaunch.lifecycle.ContextAwareDoneListener;
 import net.kdt.pojavlaunch.lifecycle.ContextExecutor;
@@ -385,6 +386,11 @@ public class LauncherActivity extends BaseActivity {
     /** Custom implementation to feel more natural when a backstack isn't present */
     @Override
     public void onBackPressed() {
+        BrixWebFragment brixFragment = (BrixWebFragment) getVisibleFragment(BrixWebFragment.TAG);
+        if (brixFragment != null && brixFragment.canGoBack()) {
+            brixFragment.goBack();
+            return;
+        }
         MicrosoftLoginFragment fragment = (MicrosoftLoginFragment) getVisibleFragment(MicrosoftLoginFragment.TAG);
         if(fragment != null){
             if(fragment.canGoBack()){
