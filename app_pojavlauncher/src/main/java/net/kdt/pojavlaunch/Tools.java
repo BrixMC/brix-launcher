@@ -544,6 +544,7 @@ public final class Tools {
             File authlibJar = new File(Tools.DIR_DATA, "authlib_injector/authlib-injector.jar");
             if (!authlibJar.exists()) AsyncAssetManager.unpackComponents(activity);
             if (!authlibJar.exists()) throw new RuntimeException("Failed to extract authlib-injector!");
+            javaArgList.add("-Dhttp.agent=BrixLauncher/1.0");
             javaArgList.add("-javaagent:" + authlibJar.getAbsolutePath() + "=https://brix-api.brix-account.workers.dev");
         }
         javaArgList.add(versionInfo.mainClass);
