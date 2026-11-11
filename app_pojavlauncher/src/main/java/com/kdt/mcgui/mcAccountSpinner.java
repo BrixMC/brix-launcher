@@ -291,7 +291,8 @@ public class mcAccountSpinner extends AppCompatSpinner implements AdapterView.On
 
     }
 
-    /** Renews a Brix session in the background and asks for a new login if it is dead */
+
+    /** Renews a Brix session if needed, reloads the face from the Brix skin, and asks for a new login if the session is dead */
     private void refreshBrixAccount(MinecraftAccount account) {
         new Thread(() -> {
             BrixAuth.Result r = BrixAuth.refreshIfNeeded(account);
@@ -300,7 +301,14 @@ public class mcAccountSpinner extends AppCompatSpinner implements AdapterView.On
                     Toast.makeText(getContext(), R.string.brix_session_expired, Toast.LENGTH_LONG).show();
                     ExtraCore.setValue(ExtraConstants.SELECT_AUTH_METHOD, true);
                 });
+                return;
             }
+            account.updateSkinFace();
+            post(() -> {
+                if (getAdapter() instanceof android.widget.BaseAdapter)
+                    ((android.widget.BaseAdapter) getAdapter()).notifyDataSetChanged();
+                invalidate();
+            });
         }).start();
     }
 
@@ -311,7 +319,7 @@ public class mcAccountSpinner extends AppCompatSpinner implements AdapterView.On
         }
         if(minecraftAccount.isLocal()) return;
         if (minecraftAccount.isBrix) {
-            if (BrixAuth.needsRefresh(minecraftAccount)) refreshBrixAccount(minecraftAccount);
+            refreshBrixAccount(minecraftAccount);
             return;
         }
 

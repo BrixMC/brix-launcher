@@ -10,6 +10,7 @@ import net.kdt.pojavlaunch.utils.FileUtils;
 import java.io.*;
 import com.google.gson.*;
 import android.graphics.Bitmap;
+import net.kdt.pojavlaunch.authenticator.brix.BrixAuth;
 import android.util.Base64;
 
 import androidx.annotation.Keep;
@@ -34,6 +35,7 @@ public class MinecraftAccount {
     private Bitmap mFaceCache;
     
     void updateSkinFace(String uuid) {
+        if (isBrix) { updateBrixSkinFace(); return; }
         try {
             File skinFile = getSkinFaceFile(username);
             Tools.downloadFile("https://mc-heads.net/head/" + uuid + "/100", skinFile.getAbsolutePath());
@@ -43,6 +45,21 @@ public class MinecraftAccount {
             // Skin refresh limit, no internet connection, etc...
             // Simply ignore updating skin face
             Log.w("SkinLoader", "Could not update skin face", e);
+        }
+    }
+
+    /** Brix accounts: the face comes from the skin served by the Brix API. */
+    private void updateBrixSkinFace() {
+        Bitmap face = BrixAuth.fetchFace(profileId);
+        if (face == null) {
+            Log.i("SkinLoader", "No Brix skin available, keeping the cached face");
+            return;
+        }
+        try (FileOutputStream out = new FileOutputStream(getSkinFaceFile(username))) {
+            face.compress(Bitmap.CompressFormat.PNG, 100, out);
+            mFaceCache = null;
+        } catch (IOException e) {
+            Log.w("SkinLoader", "Could not save the Brix face", e);
         }
     }
 

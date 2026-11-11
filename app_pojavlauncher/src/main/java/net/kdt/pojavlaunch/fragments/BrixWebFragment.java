@@ -103,6 +103,7 @@ public class BrixWebFragment extends Fragment {
                 account.accessToken = res.getString("accessToken");
                 account.expiresAt = res.getLong("expiresAt") * 1000L;
                 account.isBrix = true;
+                account.updateSkinFace();
                 ui(() -> {
                     ExtraCore.setValue(BrixLoginFragment.EXTRA_BRIX_LOGIN, account);
                     Tools.backToMainMenu(requireActivity());

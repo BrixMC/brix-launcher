@@ -1,6 +1,11 @@
 package net.kdt.pojavlaunch.authenticator.brix;
 
 import android.util.Log;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.util.Base64;
+import org.json.JSONArray;
 
 import net.kdt.pojavlaunch.value.MinecraftAccount;
 
@@ -18,8 +23,7 @@ import java.util.concurrent.Callable;
 public final class BrixAuth {
     public static final String API_BASE = "https://brix-api.brix-account.workers.dev";
     private static final String TAG = "BrixAuth";
-    // TEMP for testing: use 7L * 24 * 3600 * 1000 (7 days) in the real build
-    private static final long REFRESH_WINDOW_MS = 365L * 24 * 3600 * 1000;
+    private static final long REFRESH_WINDOW_MS = 7L * 24 * 3600 * 1000;
 
     public enum Result { OK, SKIPPED, OFFLINE, EXPIRED }
 
@@ -69,6 +73,55 @@ public final class BrixAuth {
         } finally {
             c.disconnect();
         }
+    }
+
+    /** Face of the account's skin (hat layer included, scaled up), or null if there is no skin or no network. */
+    public static Bitmap fetchFace(String profileId) {
+        return callOffThread(() -> doFetchFace(profileId), 15000, (Bitmap) null);
+    }
+
+    private static Bitmap doFetchFace(String profileId) throws Exception {
+        HttpURLConnection c = open("/sessionserver/session/minecraft/profile/" + profileId.replace("-", ""), "GET");
+        String json;
+        try {
+            if (c.getResponseCode() != 200) return null;
+            json = readAll(c.getInputStream());
+        } finally {
+            c.disconnect();
+        }
+
+        JSONArray props = new JSONObject(json).getJSONArray("properties");
+        String value = null;
+        for (int i = 0; i < props.length(); i++) {
+            JSONObject p = props.getJSONObject(i);
+            if ("textures".equals(p.optString("name"))) value = p.getString("value");
+        }
+        if (value == null) return null;
+
+        JSONObject textures = new JSONObject(
+                new String(Base64.decode(value, Base64.DEFAULT), StandardCharsets.UTF_8)).getJSONObject("textures");
+        if (!textures.has("SKIN")) return null;
+        String skinUrl = textures.getJSONObject("SKIN").getString("url");
+        if (!skinUrl.startsWith(API_BASE + "/textures/")) return null; // only trust our own host
+
+        HttpURLConnection d = (HttpURLConnection) new URL(skinUrl).openConnection();
+        d.setConnectTimeout(5000);
+        d.setReadTimeout(10000);
+        d.setRequestProperty("User-Agent", "BrixLauncher/1.0");
+        Bitmap skin;
+        try {
+            if (d.getResponseCode() != 200) return null;
+            skin = BitmapFactory.decodeStream(d.getInputStream());
+        } finally {
+            d.disconnect();
+        }
+        if (skin == null || skin.getWidth() < 64 || skin.getHeight() < 32) return null;
+
+        Bitmap face = Bitmap.createBitmap(8, 8, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(face);
+        canvas.drawBitmap(Bitmap.createBitmap(skin, 8, 8, 8, 8), 0, 0, null);
+        canvas.drawBitmap(Bitmap.createBitmap(skin, 40, 8, 8, 8), 0, 0, null);
+        return Bitmap.createScaledBitmap(face, 100, 100, false);
     }
 
     private static HttpURLConnection open(String path, String method) throws Exception {
