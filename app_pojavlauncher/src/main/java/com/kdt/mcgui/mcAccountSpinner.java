@@ -1,5 +1,6 @@
 package com.kdt.mcgui;
 
+import net.kdt.pojavlaunch.authenticator.brix.BrixAuth;
 import net.kdt.pojavlaunch.fragments.BrixLoginFragment;
 import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
@@ -290,12 +291,29 @@ public class mcAccountSpinner extends AppCompatSpinner implements AdapterView.On
 
     }
 
+    /** Renews a Brix session in the background and asks for a new login if it is dead */
+    private void refreshBrixAccount(MinecraftAccount account) {
+        new Thread(() -> {
+            BrixAuth.Result r = BrixAuth.refreshIfNeeded(account);
+            if (r == BrixAuth.Result.EXPIRED) {
+                post(() -> {
+                    Toast.makeText(getContext(), R.string.brix_session_expired, Toast.LENGTH_LONG).show();
+                    ExtraCore.setValue(ExtraConstants.SELECT_AUTH_METHOD, true);
+                });
+            }
+        }).start();
+    }
+
     private void performLogin(MinecraftAccount minecraftAccount){
         // Logging in when there's no internet is useless. This should really be turned into a network callback though.
         if(!Tools.isOnline(getContext())){
             return;
         }
         if(minecraftAccount.isLocal()) return;
+        if (minecraftAccount.isBrix) {
+            if (BrixAuth.needsRefresh(minecraftAccount)) refreshBrixAccount(minecraftAccount);
+            return;
+        }
 
         mLoginBarPaint.setColor(getResources().getColor(R.color.minebutton_color));
         if(minecraftAccount.isMicrosoft){

@@ -528,4 +528,5 @@
     <string name="brix_err_taken" translatable="false">That username is already taken</string>
     <string name="brix_err_network" translatable="false">Could not reach the Brix server</string>
     <string name="brix_err_generic" translatable="false">Login failed (%s)</string>
+    <string name="brix_session_expired" translatable="false">Your Brix session expired. Please log in again.</string>
 </resources>

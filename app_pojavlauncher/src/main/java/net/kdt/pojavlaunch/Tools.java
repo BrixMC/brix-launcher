@@ -1,5 +1,6 @@
 package net.kdt.pojavlaunch;
 
+import net.kdt.pojavlaunch.authenticator.brix.BrixAuth;
 import static android.os.Build.VERSION.SDK_INT;
 import static android.os.Build.VERSION_CODES.P;
 import static net.kdt.pojavlaunch.Architecture.archAsStringAndroid;
@@ -405,6 +406,14 @@ public final class Tools {
 
     public static void launchMinecraft(final AppCompatActivity activity, MinecraftAccount minecraftAccount,
                                        MinecraftProfile minecraftProfile, String versionId, int versionJavaRequirement) throws Throwable {
+        // Brix accounts: renew the session token if it is about to expire, and only use
+        // the Brix auth agent when the API can be reached (so offline play still works)
+        boolean brixOnline = false;
+        if (minecraftAccount.isBrix && brixOnline) {
+            if (BrixAuth.refreshIfNeeded(minecraftAccount) == BrixAuth.Result.EXPIRED)
+                throw new RuntimeException(activity.getString(R.string.brix_session_expired));
+            brixOnline = BrixAuth.apiReachable();
+        }
         int freeDeviceMemory = getFreeDeviceMemory(activity);
         int localeString;
         int freeAddressSpace = Architecture.is32BitsDevice() ? getMaxContinuousAddressSpaceSize() : -1;
@@ -540,7 +549,7 @@ public final class Tools {
         // We use a janky lwjgl setup. We don't want more people complaining it crashes.
         if (hasSodiumMod) javaArgList.add("-Dsodium.checks.issue2561=false");
         // Brix accounts: route auth and skins to the Brix API via authlib-injector
-        if (minecraftAccount.isBrix) {
+        if (minecraftAccount.isBrix && brixOnline) {
             File authlibJar = new File(Tools.DIR_DATA, "authlib_injector/authlib-injector.jar");
             if (!authlibJar.exists()) AsyncAssetManager.unpackComponents(activity);
             if (!authlibJar.exists()) throw new RuntimeException("Failed to extract authlib-injector!");
